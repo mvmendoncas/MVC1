@@ -5,6 +5,7 @@
 package view;
 
 import controller.ControllerCliente;
+import model.ModelCliente;
 
 /**
  *
@@ -13,12 +14,42 @@ import controller.ControllerCliente;
 public class ViewClienteInformation extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ViewClienteInformation.class.getName());
+    
+    private String cpfCliente;
 
     /**
      * Creates new form ViewCliente
      */
     public ViewClienteInformation() {
         initComponents();
+    }
+    public ViewClienteInformation(String cpf) {
+        this.cpfCliente = cpf;
+        initComponents();
+        // Chama o método para preencher os campos com os dados do cliente
+        carregarDadosCliente(); 
+    }
+    
+    private void carregarDadosCliente() {
+        if (this.cpfCliente == null || this.cpfCliente.isEmpty()) return;
+
+        ControllerCliente controller = new ControllerCliente();
+        ModelCliente cliente = controller.buscarClientePorCpf(this.cpfCliente);
+
+        if (cliente != null) {
+            // Preenche os campos de texto com os dados encontrados
+            jTextField1.setText(cliente.getNome());
+            jTextField3.setText(cliente.getCpf());
+            jTextField2.setText(String.valueOf(cliente.getIdade()));
+            
+            // Opcional: Bloquear a edição do CPF, pois ele é a chave
+            jTextField3.setEditable(false);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Cliente não encontrado com CPF: " + this.cpfCliente, 
+                "Erro de Carga", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -197,26 +228,31 @@ public class ViewClienteInformation extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        int confirmacao = javax.swing.JOptionPane.showConfirmDialog(this, 
+       int confirmacao = javax.swing.JOptionPane.showConfirmDialog(this, 
             "Tem certeza que deseja deletar sua conta?", "Confirmação de Deleção",
             javax.swing.JOptionPane.YES_NO_OPTION);
 
         if (confirmacao == javax.swing.JOptionPane.YES_OPTION) {
-            // **Aqui você chamaria o Controller para deletar o cliente**
-            // Exemplo: new ControllerCliente().deletar();
             
-            this.dispose(); 
-            ViewClienteHome home = new ViewClienteHome();
-            home.setVisible(true);
-            javax.swing.JOptionPane.showMessageDialog(home, "Conta deletada com sucesso!");
+            ControllerCliente controller = new ControllerCliente();
+            boolean sucesso = controller.deletarCliente(this.cpfCliente); // **Deleta usando o CPF guardado**
+
+            if (sucesso) {
+                this.dispose(); 
+                // Volta para a tela inicial (Home)
+                ViewClienteHome home = new ViewClienteHome();
+                home.setVisible(true);
+                javax.swing.JOptionPane.showMessageDialog(home, "Conta deletada com sucesso!");
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Erro ao deletar a conta. Tente novamente.");
+            }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        String nome = jTextField1.getText();
-        String cpf = jTextField3.getText(); 
+      String nome = jTextField1.getText();
+        String cpf = this.cpfCliente; // **IMPORTANTE: Usa o CPF original guardado**
         int idade = 0;
         try {
             idade = Integer.parseInt(jTextField2.getText()); 
@@ -225,17 +261,21 @@ public class ViewClienteInformation extends javax.swing.JFrame {
             return; 
         }
 
-        // 2. Instancia e chama o Controller para atualizar
-        ControllerCliente cliente = new ControllerCliente(nome, cpf, idade);
-        cliente.atualizar(); // Chama o método abstrato implementado no Controller
+        // 2. Chama o Controller para atualizar
+        ControllerCliente controller = new ControllerCliente();
+        boolean sucesso = controller.atualizarCliente(nome, cpf, idade);
         
-        // 3. Fecha a janela atual
-        this.dispose(); 
-        
-        // 4. Volta para a janela de Boas-Vindas
-        ViewClienteBoasVinda boasVinda = new ViewClienteBoasVinda();
-        boasVinda.setVisible(true);
-        javax.swing.JOptionPane.showMessageDialog(boasVinda, "Informações atualizadas com sucesso!");
+        if (sucesso) {
+            // 3. Fecha a janela atual
+            this.dispose(); 
+            
+            // 4. Volta para a janela de Boas-Vindas, passando o CPF atualizado
+            ViewClienteBoasVinda boasVinda = new ViewClienteBoasVinda(cpf);
+            boasVinda.setVisible(true);
+            javax.swing.JOptionPane.showMessageDialog(boasVinda, "Informações atualizadas com sucesso!");
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Erro ao atualizar o cliente.");
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

@@ -4,19 +4,63 @@
  */
 package view;
 
+import controller.ControllerCliente;
+import model.ModelCliente;
+
 /**
  *
  * @author thiag
  */
 public class ViewClienteBoasVinda extends javax.swing.JFrame {
     
+   private String cpfCliente; 
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ViewClienteBoasVinda.class.getName());
-
     /**
      * Creates new form ViewCliente
      */
     public ViewClienteBoasVinda() {
         initComponents();
+    }
+    
+    public ViewClienteBoasVinda(String cpf) {
+        this.cpfCliente = cpf;
+        initComponents();
+        carregarInformacoesCliente();
+        // Opcional: Mostrar o CPF no console para debug
+        System.out.println("Boas-Vindas para CPF: " + this.cpfCliente); 
+    }
+    
+    private void carregarInformacoesCliente() {
+        if (this.cpfCliente == null || this.cpfCliente.isEmpty()) {
+            jLabel1.setText("<html><center>Bem-vindo(a)!</center></html>");
+            return;
+        }
+
+        ControllerCliente controller = new ControllerCliente();
+        ModelCliente cliente = controller.buscarClientePorCpf(this.cpfCliente);
+
+        if (cliente != null) {
+            // Usamos HTML no JLabel para quebrar a linha e formatar
+            String nome = cliente.getNome().split(" ")[0]; // Pega só o primeiro nome
+            
+            String htmlText = String.format(
+                "<html><center>Bem-vindo(a), <span style='color: #4CAF50;'>%s!</span>" +
+                "<br><br><span style='font-size: 14px; color: gray;'>CPF: %s</span>" +
+                "<br><span style='font-size: 14px; color: gray;'>Idade: %d anos</span>" +
+                "</center></html>",
+                nome,
+                cliente.getCpf(),
+                cliente.getIdade()
+            );
+            
+            // Atualiza o JLabel principal (jLabel1) com a saudação e os dados
+            jLabel1.setText(htmlText);
+            
+        } else {
+            // Caso o cliente não seja encontrado (erro no arquivo)
+            jLabel1.setText("<html><center>Bem-vindo(a)! Cliente não encontrado.</center></html>");
+        }
     }
 
     /**
@@ -105,8 +149,8 @@ public class ViewClienteBoasVinda extends javax.swing.JFrame {
         // Fecha a janela atual (Boas-Vindas)
         this.dispose(); 
         
-        // Cria e mostra a janela de Edição/Informação
-        ViewClienteInformation informacao = new ViewClienteInformation();
+        // CORREÇÃO: Cria e mostra a janela de Edição/Informação PASSANDO O CPF
+        ViewClienteInformation informacao = new ViewClienteInformation(this.cpfCliente);
         informacao.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 

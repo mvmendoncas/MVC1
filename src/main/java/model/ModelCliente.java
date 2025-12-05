@@ -8,44 +8,30 @@ package model;
  *
  * @author thiag
  */
-public abstract class ModelCliente {
+public class ModelCliente {
     private String nome;
     private String cpf;
     private int idade;
 
+    // Construtor completo
     public ModelCliente(String nome, String cpf, int idade) {
         this.nome = nome;
         this.cpf = cpf;
         this.idade = idade;
     }
-    
-    public abstract void cadastrar();
-    public abstract void visualizar();
-    public abstract void deletar();
-    public abstract void atualizar();
 
-    public String getNome() {
-        return nome;
+    // Método para formatar o objeto como uma linha para o arquivo
+    public String toFileString() {
+        return nome + ";" + cpf + ";" + idade;
     }
 
-    public String getCpf() {
-        return cpf;
-    }
+    // Getters
+    public String getNome() { return nome; }
+    public String getCpf() { return cpf; }
+    public int getIdade() { return idade; }
 
-    public int getIdade() {
-        return idade;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public void setIdade(int idade) {
-        this.idade = idade;
-    }
-    
+    // Setters (para atualização)
+    public void setNome(String nome) { this.nome = nome; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+    public void setIdade(int idade) { this.idade = idade; }
 }

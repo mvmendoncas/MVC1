@@ -181,29 +181,33 @@ public class ViewClienteCadastro extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        // 1. Coleta os dados dos campos de texto
+       // 1. Coleta os dados dos campos de texto
         String nome = jTextField1.getText();
-        String cpf = jTextField3.getText(); // Note: jTextField3 é o campo do CPF
+        String cpf = jTextField3.getText(); // Captura o CPF para passar
         int idade = 0;
         try {
-            idade = Integer.parseInt(jTextField2.getText()); // Note: jTextField2 é o campo da Idade
+            idade = Integer.parseInt(jTextField2.getText());
         } catch (NumberFormatException e) {
-            // Lidar com erro de entrada de idade
             javax.swing.JOptionPane.showMessageDialog(this, "Idade inválida. Por favor, digite um número.");
-            return; 
+            return;
         }
 
-        // 2. Instancia e chama o Controller para cadastrar
-        ControllerCliente cliente = new ControllerCliente(nome, cpf, idade);
-        cliente.cadastrar(); // Chama o método abstrato implementado no Controller
+        // 2. Instancia o Controller e chama o método de cadastro
+        ControllerCliente controller = new ControllerCliente();
         
-        // 3. Fecha a janela atual (Cadastro)
-        this.dispose(); 
+        boolean sucesso = controller.cadastrarCliente(nome, cpf, idade);
         
-        // 4. Cria e mostra a próxima janela (Boas-Vindas)
-        ViewClienteBoasVinda boasVinda = new ViewClienteBoasVinda();
-        boasVinda.setVisible(true);
+        if (sucesso) {
+            // 3. Se cadastrado com sucesso, avança para a próxima tela
+            this.dispose();
+            
+            // CORREÇÃO: Passa o CPF para a ViewClienteBoasVinda
+            ViewClienteBoasVinda boasVinda = new ViewClienteBoasVinda(cpf); 
+            boasVinda.setVisible(true);
+            javax.swing.JOptionPane.showMessageDialog(boasVinda, "Cadastro realizado e salvo em arquivo!");
+        } else {
+             javax.swing.JOptionPane.showMessageDialog(this, "Erro no cadastro. Verifique os dados.");
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
